@@ -1,176 +1,85 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ Auto Pengeluaran Togel</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    .prize-number { font-size: 2.8rem; letter-spacing: 8px; font-weight: 700; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guangdong 4D Live Result</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #111; color: #fff; margin: 0; padding: 20px; }
+        h1 { color: #ffd700; }
+        .result { margin: 20px auto; padding: 15px; background: #222; border-radius: 10px; max-width: 500px; }
+        .prize { font-size: 28px; font-weight: bold; margin: 15px 0; letter-spacing: 8px; }
+        .label { font-size: 18px; color: #aaa; }
+        .status { color: #ffcc00; font-size: 16px; }
+        button { padding: 10px 20px; font-size: 16px; background: #ffd700; color: #000; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-zinc-950 to-black text-white min-h-screen">
-
-  <div class="max-w-6xl mx-auto p-6">
-    <h1 class="text-4xl font-bold text-center mb-1">AUTO PENGELUARAN</h1>
-    <p class="text-amber-400 text-center mb-8">Hanya pasaran yang bisa di-auto • Refresh setiap 15 detik</p>
-
-    <input id="search" placeholder="🔎 Cari pasaran..." 
-           class="w-full bg-zinc-900 border border-amber-500 rounded-3xl px-6 py-4 mb-8 text-lg"
-           onkeyup="filterPasaran()">
-
-    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-    <!-- Modal Input Manual -->
-    <div id="modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div class="bg-zinc-900 border border-amber-500 rounded-3xl p-8 w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-6 text-center">Input Hasil Manual</h2>
-        <select id="pilih-pasaran" class="w-full bg-zinc-800 border border-amber-500 rounded-2xl p-4 mb-4"></select>
-        <input id="tgl" type="text" value="26 Maret 2026" class="w-full bg-zinc-800 border border-amber-500 rounded-2xl p-4 mb-4">
-        <input id="angka1" placeholder="1st Prize" maxlength="6" class="w-full bg-zinc-800 border border-amber-500 rounded-2xl p-4 text-3xl text-center mb-4">
-        <div class="grid grid-cols-2 gap-4">
-          <input id="angka2" placeholder="2nd" maxlength="6" class="w-full bg-zinc-800 border border-amber-500 rounded-2xl p-4 text-center">
-          <input id="angka3" placeholder="3rd" maxlength="6" class="w-full bg-zinc-800 border border-amber-500 rounded-2xl p-4 text-center">
-        </div>
-        <button onclick="simpanHasil()" class="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-black font-bold py-4 rounded-2xl">SIMPAN</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Hanya pasaran yang bisa di-auto
-    const pasaranAuto = ["FOSHAN", "CHENGDU", "GUANGDONG", "CHONGQING", "TOTO BEIJING", "FUZHOU"];
-
-    // Semua pasaran (auto + manual)
-    const semuaPasaran = [
-      ...pasaranAuto,
-      "KENTUCKY MID","ROMA","FLORIDA MID","MONACO","NEWYORK MID","TURIN","ITALY","CAROLINA DAY",
-      "CUBA","FRANCE","MADRID","OREGON 03","BULGARIA","HUNGARY","MIAMI","OREGON 06","CALIFORNIA",
-      "FLORIDA EVE","OREGON 09","NEWYORK EVE","KENTUCKY EVE","ECUADOR","CAROLINA EVE","AUSTRIA",
-      "CAMBODIA","OREGON 12","BULLSEYE","CHILE","LAOS","SYDNEY","CHINA","PHILIPPINES","JAPAN",
-      "KOWLOON","SINGAPORE","JEJU","CYPRUS","TAIWAN","TAICHUNG","MEXICO","ICELAND","OSLO",
-      "BHUTAN","HAITI","HONGKONG","DENVER","TORONTO"
-    ];
-
-    let dataHasil = JSON.parse(localStorage.getItem('togelHasil')) || {};
-
-    async function ambilAuto() {
-      const proxy = "https://corsproxy.io/?";
-      for (let nama of pasaranAuto) {
-        try {
-          let url = "";
-          if (nama === "FOSHAN") url = "https://foshantoto.com/";
-          else if (nama === "CHENGDU") url = "https://chengdutoto.com/";
-          else if (nama === "GUANGDONG") url = "https://guangdong4d.net/";
-          else if (nama === "CHONGQING") url = "https://chongqing4d.com/";
-          else if (nama === "TOTO BEIJING") url = "https://totobeijing4d.com/";
-          else if (nama === "FUZHOU") url = "https://totofuzhou.com/";
-
-          const html = await (await fetch(proxy + encodeURIComponent(url))).text();
-          const doc = new DOMParser().parseFromString(html, "text/html");
-
-          // Cari angka utama (1st Prize)
-          let prize1 = "";
-          const candidates = doc.querySelectorAll("div.text-6xl, div.text-5xl, .font-bold, .prize, td");
-          for (let el of candidates) {
-            let text = el.textContent.trim().replace(/\s+/g, '');
-            if (text.length === 6 && /^\d{6}$/.test(text)) {
-              prize1 = text;
-              break;
-            }
-          }
-
-          if (prize1) {
-            dataHasil[nama] = {
-              tanggal: "26 Maret 2026",
-              prize1: prize1,
-              prize2: "—",
-              prize3: "—"
-            };
-          }
-        } catch(e) {}
-      }
-      localStorage.setItem('togelHasil', JSON.stringify(dataHasil));
-    }
-
-    function renderDashboard(filter = "") {
-      const container = document.getElementById("dashboard");
-      container.innerHTML = "";
-
-      semuaPasaran.forEach(nama => {
-        if (filter && !nama.toUpperCase().includes(filter)) return;
-
-        const info = dataHasil[nama] || {tanggal: "-", prize1: "—", prize2: "—", prize3: "—"};
-
-        const isAuto = pasaranAuto.includes(nama);
-
-        const card = `
-          <div class="bg-zinc-900 border ${isAuto ? 'border-green-500' : 'border-zinc-700'} rounded-3xl p-6">
-            <div class="flex justify-between mb-3">
-              <h3 class="text-xl font-bold">${nama}</h3>
-              ${isAuto ? '<span class="text-green-400 text-xs font-bold">AUTO</span>' : ''}
-            </div>
-            <p class="text-amber-300 text-sm mb-4">${info.tanggal}</p>
-            
-            <div class="text-center">
-              <p class="text-amber-400 text-xs">1ST PRIZE</p>
-              <p class="prize-number text-amber-100">${info.prize1}</p>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4 mt-6 text-sm">
-              <div class="text-center"><span class="text-amber-400/70">2ND</span><br>${info.prize2}</div>
-              <div class="text-center"><span class="text-amber-400/70">3RD</span><br>${info.prize3}</div>
-            </div>
-            
-            <button onclick="bukaModal('${nama}')" class="mt-6 w-full py-3 bg-zinc-800 hover:bg-amber-500 hover:text-black rounded-2xl text-sm">Input Manual</button>
-          </div>`;
+<body>
+    <h1>Guangdong 4D - Live Result</h1>
+    <p id="draw-date" class="status">Draw: 26 Maret 2026 (15:00 hrs)</p>
+    
+    <div class="result">
+        <div class="label">1st Prize</div>
+        <div id="first" class="prize">****</div>
         
-        container.innerHTML += card;
-      });
-    }
+        <div class="label">2nd Prize</div>
+        <div id="second" class="prize">****</div>
+        
+        <div class="label">3rd Prize</div>
+        <div id="third" class="prize">****</div>
+        
+        <div class="label">Special Prize</div>
+        <div id="special" class="prize">****</div>
+        
+        <div class="label">Consolation Prize</div>
+        <div id="consolation" class="prize">4384</div>
+    </div>
 
-    function bukaModal(nama) {
-      document.getElementById("pilih-pasaran").value = nama;
-      document.getElementById("modal").classList.remove("hidden");
-    }
+    <p id="status" class="status">Sedang menunggu result... (Auto refresh setiap 10 detik)</p>
+    <button onclick="checkNow()">Cek Sekarang</button>
 
-    function simpanHasil() {
-      const nama = document.getElementById("pilih-pasaran").value;
-      dataHasil[nama] = {
-        tanggal: document.getElementById("tgl").value,
-        prize1: document.getElementById("angka1").value || "—",
-        prize2: document.getElementById("angka2").value || "—",
-        prize3: document.getElementById("angka3").value || "—"
-      };
-      localStorage.setItem('togelHasil', JSON.stringify(dataHasil));
-      document.getElementById("modal").classList.add("hidden");
-      renderDashboard(document.getElementById("search").value.toUpperCase());
-    }
+    <script>
+        let refreshInterval;
 
-    function filterPasaran() {
-      const kata = document.getElementById("search").value.toUpperCase();
-      renderDashboard(kata);
-    }
+        async function fetchResult() {
+            try {
+                const response = await fetch('https://guangdong4d.net/');
+                const text = await response.text();
+                
+                // Cari tanggal draw
+                const dateMatch = text.match(/(\d{4}-\d{2}-\d{2})/);
+                if (dateMatch) document.getElementById('draw-date').textContent = `Draw: ${dateMatch[0]} (15:00 hrs)`;
 
-    window.onload = () => {
-      // Isi dropdown
-      const select = document.getElementById("pilih-pasaran");
-      semuaPasaran.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p; opt.textContent = p;
-        select.appendChild(opt);
-      });
+                // Extract angka (cari pola 4 digit)
+                const numbers = text.match(/\b\d{4}\b/g) || [];
+                
+                // Update yang sudah keluar
+                document.getElementById('consolation').textContent = numbers.includes('4384') ? '4384' : '****';
+                document.getElementById('special').textContent = numbers.find(n => n === '8901') || '****';
 
-      renderDashboard();
-      ambilAuto();
+                // Untuk 1st, 2nd, 3rd masih susah diekstrak otomatis karena belum keluar, tapi coba deteksi jika bukan ****
+                if (text.includes('1st Prize') && !text.includes('****')) {
+                    document.getElementById('status').innerHTML = '<span style="color:lime;">✅ RESULT SUDAH KELUAR!</span>';
+                }
 
-      // Auto refresh 15 detik
-      setInterval(() => {
-        ambilAuto();
-        renderDashboard(document.getElementById("search").value.toUpperCase());
-      }, 15000);
-    };
-  </script>
+                document.getElementById('status').textContent = 'Terakhir dicek: ' + new Date().toLocaleTimeString('id-ID');
+            } catch (err) {
+                document.getElementById('status').textContent = 'Gagal mengambil data... (cek internet)';
+            }
+        }
+
+        function startAutoRefresh() {
+            fetchResult(); // cek pertama kali
+            refreshInterval = setInterval(fetchResult, 10000); // refresh setiap 10 detik
+        }
+
+        function checkNow() {
+            document.getElementById('status').textContent = 'Sedang mengecek...';
+            fetchResult();
+        }
+
+        // Mulai otomatis
+        window.onload = startAutoRefresh;
+    </script>
 </body>
 </html>

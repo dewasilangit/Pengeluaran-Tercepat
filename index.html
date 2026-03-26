@@ -3,174 +3,305 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ Pengeluaran Togel - Update Kilat</title>
+  <title>⚡ Angka Sah - Update Kilat</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .prize { font-size: 2.2rem; letter-spacing: 6px; font-weight: bold; }
-    .card { transition: all 0.3s; }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px rgba(0,0,0,0.3); }
-    .loading { animation: pulse 1.5s infinite; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .gold-border {
+      border: 2px solid #f59e0b;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+    }
+    .input-focus {
+      transition: all 0.3s;
+    }
+    .input-focus:focus {
+      border-color: #f59e0b;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+    }
+    .prize-number {
+      font-size: 2.8rem;
+      letter-spacing: 12px;
+      font-weight: 700;
+      text-shadow: 0 0 20px #f59e0b;
+    }
   </style>
 </head>
-<body class="bg-gray-950 text-white min-h-screen">
-  <div class="max-w-6xl mx-auto p-4 md:p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-4xl font-bold">⚡ Pengeluaran Result Togel</h1>
-      <button onclick="refreshAll()" 
-              class="bg-green-600 hover:bg-green-500 px-8 py-3 rounded-2xl font-bold text-lg flex items-center gap-2">
-        🔄 Refresh Semua Sekarang
-      </button>
-    </div>
-    <p class="text-center text-green-400 mb-8 text-sm">Auto refresh saat buka halaman • Klik tombol untuk update kilat</p>
+<body class="bg-gradient-to-br from-[#1a0f0a] to-[#2c1a14] text-white min-h-screen">
 
-    <div id="pasaran-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Semua pasaran akan muncul di sini otomatis -->
+  <div class="max-w-7xl mx-auto p-6">
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-8 border-b border-amber-500/30 pb-6">
+      <div>
+        <h1 class="text-5xl font-bold tracking-tight">ANGKA SAH</h1>
+        <p class="text-amber-400 text-xl">Update paling cepat • Model sendiri</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="refreshAll()" 
+                class="bg-amber-600 hover:bg-amber-500 px-8 py-4 rounded-2xl font-bold text-lg flex items-center gap-3">
+          🔄 REFRESH SEMUA SEKARANG
+        </button>
+        <div onclick="showInputModal()" 
+             class="cursor-pointer bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold px-8 py-4 rounded-2xl flex items-center gap-2">
+          ➕ INPUT HASIL BARU
+        </div>
+      </div>
     </div>
 
-    <div class="text-center text-xs text-gray-500 mt-12">
-      Catatan: Beberapa situs resmi sulit di-scrape otomatis. Kalau error, update manual via GitHub tetap paling cepat & akurat.<br>
-      Web ini di-host di GitHub Pages.
+    <!-- SEARCH & FILTER -->
+    <div class="mb-8">
+      <input 
+        id="search-input"
+        type="text" 
+        placeholder="🔎 Cari pasaran (contoh: Guangdong, Foshan, Singapore...)"
+        onkeyup="filterPasaran()"
+        class="w-full bg-[#2c1a14] border border-amber-500/50 text-white placeholder:text-amber-300 rounded-3xl px-8 py-5 text-lg focus:outline-none input-focus">
+    </div>
+
+    <!-- DASHBOARD RESULT -->
+    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Cards hasil akan muncul di sini lewat JS -->
+    </div>
+
+    <!-- MODAL INPUT HASIL (sesuai gambar kamu) -->
+    <div id="input-modal" onclick="if(event.target===this)hideInputModal()" 
+         class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+      <div onclick="event.stopImmediatePropagation()" 
+           class="bg-[#1a0f0a] border-2 border-amber-500 rounded-3xl p-8 w-full max-w-lg gold-border">
+        
+        <h2 class="text-3xl font-bold mb-6 text-center text-amber-400">INPUT HASIL KELUARAN</h2>
+        
+        <!-- PILIH PASARAN -->
+        <div class="mb-6">
+          <label class="block text-amber-400 text-sm font-bold mb-2">PILIH PASARAN</label>
+          <select id="modal-pasaran" class="w-full bg-[#2c1a14] border border-amber-500 text-white rounded-2xl px-6 py-4 text-lg">
+            <!-- diisi otomatis oleh JS -->
+          </select>
+        </div>
+
+        <!-- TANGGAL -->
+        <div class="mb-6">
+          <label class="block text-amber-400 text-sm font-bold mb-2">TANGGAL</label>
+          <input id="modal-tanggal" type="text" value="26 Maret 2026" 
+                 class="w-full bg-[#2c1a14] border border-amber-500 text-white rounded-2xl px-6 py-4 text-lg input-focus">
+        </div>
+
+        <!-- ANGKA SAH / PRIZE -->
+        <div class="mb-6">
+          <label class="block text-amber-400 text-sm font-bold mb-2">ANGKA SAH (1st Prize)</label>
+          <input id="modal-angka-sah" type="text" placeholder="Masukkan angka..." maxlength="6"
+                 class="w-full bg-[#2c1a14] border border-amber-500 text-white rounded-2xl px-6 py-4 text-4xl text-center prize-number input-focus">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-8">
+          <div>
+            <label class="block text-amber-400 text-sm font-bold mb-2">2nd Prize</label>
+            <input id="modal-prize2" type="text" maxlength="6"
+                   class="w-full bg-[#2c1a14] border border-amber-500 text-white rounded-2xl px-6 py-4 text-center text-2xl input-focus">
+          </div>
+          <div>
+            <label class="block text-amber-400 text-sm font-bold mb-2">3rd Prize</label>
+            <input id="modal-prize3" type="text" maxlength="6"
+                   class="w-full bg-[#2c1a14] border border-amber-500 text-white rounded-2xl px-6 py-4 text-center text-2xl input-focus">
+          </div>
+        </div>
+
+        <!-- BUTTON -->
+        <div class="flex gap-4">
+          <button onclick="saveResult()" 
+                  class="flex-1 bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold py-5 rounded-2xl text-xl">
+            💾 SIMPAN HASIL
+          </button>
+          <button onclick="hideInputModal()" 
+                  class="flex-1 border border-amber-500 text-amber-400 font-bold py-5 rounded-2xl text-xl">
+            BATAL
+          </button>
+        </div>
+
+        <!-- Preview Twitter -->
+        <div onclick="previewTwitter()" 
+             class="mt-6 text-center text-amber-400 font-bold cursor-pointer hover:text-yellow-400">
+          📸 PREVIEW CAPTION TWITTER
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="text-center text-xs text-amber-300/70 mt-12">
+      Data disimpan di browser (localStorage) • Otomatis refresh setiap 30 detik<br>
+      Untuk permanen di GitHub: klik tombol “Export JSON” di bawah
+      <button onclick="exportJSON()" class="ml-4 text-amber-400 underline">📤 Export JSON sekarang</button>
     </div>
   </div>
 
   <script>
-    const proxies = [
-      "https://corsproxy.io/?",
-      "https://api.allorigins.win/get?url=",
-      "https://cors.anyorigin.workers.dev/?url="
+    // SEMUA PASARAN (dari link kamu)
+    let pasaranList = [
+      "KENTUCKY MID","ROMA","FLORIDA MID","MONACO","NEWYORK MID","TURIN","ITALY","CAROLINA DAY",
+      "CUBA","FRANCE","MADRID","OREGON 03","BULGARIA","HUNGARY","MIAMI","OREGON 06","CALIFORNIA",
+      "FLORIDA EVE","OREGON 09","NEWYORK EVE","KENTUCKY EVE","ECUADOR","CAROLINA EVE","AUSTRIA",
+      "CAMBODIA","FOSHAN","OREGON 12","BULLSEYE","CHILE","LAOS","SYDNEY","CHENGDU","GUANGDONG",
+      "CHINA","CHONGQING","PHILIPPINES","JAPAN","KOWLOON","SINGAPORE","JEJU","TOTO BEIJING",
+      "FUZHOU","CYPRUS","TAIWAN","TAICHUNG","MEXICO","ICELAND","OSLO","BHUTAN","HAITI",
+      "HONGKONG","DENVER","TORONTO"
     ];
 
-    const pasaranList = [
-      {name: "FOSHAN", url: "https://foshantoto.com/"},
-      {name: "KENTUCKY MID", url: "https://kylottery.com"},
-      {name: "ROMA", url: "https://romalottery4d.com"},
-      {name: "FLORIDA MID", url: "https://flalottery.com"},
-      {name: "MONACO", url: "https://monacopools4d.com"},
-      {name: "NEWYORK MID", url: "https://nylottery.ny.gov"},
-      {name: "TURIN", url: "https://turinpools4d.org"},
-      {name: "ITALY", url: "https://italylotto4d.com"},
-      {name: "CAROLINA DAY", url: "https://wral.com"},
-      {name: "CUBA", url: "https://cubalotto.com"},
-      {name: "FRANCE", url: "https://francelottery4d.com"},
-      {name: "MADRID", url: "https://madridlotto4d.com"},
-      {name: "OREGON 03", url: "https://lotterypost.com/results/or"},
-      {name: "BULGARIA", url: "https://bulgarialottodraw.com"},
-      {name: "HUNGARY", url: "https://hungarylotto4d.com"},
-      {name: "MIAMI", url: "https://miamilottery4d.us"},
-      {name: "OREGON 06", url: "https://lotterypost.com/results/or"},
-      {name: "CALIFORNIA", url: "https://calottery.com"},
-      {name: "FLORIDA EVE", url: "https://flalottery.com/pick4"},
-      {name: "OREGON 09", url: "https://lotterypost.com/results/or"},
-      {name: "NEWYORK EVE", url: "https://nylottery.ny.gov"},
-      {name: "KENTUCKY EVE", url: "https://kylottery.com"},
-      {name: "ECUADOR", url: "https://ecuadorlotto.com"},
-      {name: "CAROLINA EVE", url: "https://wral.com"},
-      {name: "AUSTRIA", url: "https://austrialotterydraw.com"},
-      {name: "CAMBODIA", url: "https://magnumcambodia.com"},
-      {name: "OREGON 12", url: "https://lotterypost.com/results/or"},
-      {name: "BULLSEYE", url: "https://mylotto.co.nz"},
-      {name: "CHILE", url: "https://chilelotto4d.com"},
-      {name: "LAOS", url: "https://laoslotterydraw.com"},
-      {name: "SYDNEY", url: "https://lottosydney.net"},
-      {name: "CHENGDU", url: "https://chengdutoto.com"},
-      {name: "GUANGDONG", url: "https://guangdong4d.net"},
-      {name: "CHINA", url: "https://chinatoto4d.asia"},
-      {name: "CHONGQING", url: "https://chongqing4d.com"},
-      {name: "PHILIPPINES", url: "https://phplottery.com"},
-      {name: "JAPAN", url: "https://japanlottery.online"},
-      {name: "KOWLOON", url: "https://kowloon4d.com"},
-      {name: "SINGAPORE", url: "https://www.singaporepools.com.sg"},
-      {name: "JEJU", url: "https://jejulotto.com"},
-      {name: "TOTO BEIJING", url: "https://totobeijing4d.com"},
-      {name: "FUZHOU", url: "https://totofuzhou.com"},
-      {name: "CYPRUS", url: "https://cypruspools4d.com"},
-      {name: "TAIWAN", url: "https://taiwan-lotto.com"},
-      {name: "TAICHUNG", url: "https://taichung4d.com"},
-      {name: "MEXICO", url: "https://mexicopools4d.com"},
-      {name: "ICELAND", url: "https://icelandlottery.org"},
-      {name: "OSLO", url: "https://oslolotto.com"},
-      {name: "BHUTAN", url: "https://bhutanpools4d.com"},
-      {name: "HAITI", url: "https://haitilotto4d.com"},
-      {name: "HONGKONG", url: "https://lottohongkong.net"},
-      {name: "DENVER", url: "https://denverwla.us"},
-      {name: "TORONTO", url: "https://torontolottodraw.com"}
-    ];
+    // Data hasil (default kosong, kamu isi lewat form)
+    let results = JSON.parse(localStorage.getItem('angkaSahResults')) || {};
 
-    async function fetchWithProxy(url) {
-      for (let proxy of proxies) {
-        try {
-          let fullUrl = proxy.includes("allorigins") 
-            ? proxy + encodeURIComponent(url) + "&_=" + Date.now()
-            : proxy + encodeURIComponent(url);
-          
-          const res = await fetch(fullUrl, {cache: "no-store"});
-          if (res.ok) {
-            const text = proxy.includes("allorigins") 
-              ? (await res.json()).contents 
-              : await res.text();
-            return text;
-          }
-        } catch (e) {}
-      }
-      return null;
+    function saveToLocal() {
+      localStorage.setItem('angkaSahResults', JSON.stringify(results));
     }
 
-    function createCard(pasaran) {
-      const card = document.createElement("div");
-      card.className = `bg-gray-900 rounded-3xl p-6 card border border-gray-800`;
-      card.innerHTML = `
-        <div class="flex justify-between items-start mb-4">
-          <h2 class="text-xl font-bold">${pasaran.name}</h2>
-          <button onclick="refreshSingle(this, '${pasaran.url}')" 
-                  class="text-xs bg-gray-800 hover:bg-gray-700 px-4 py-1 rounded-xl">Refresh</button>
-        </div>
-        <div class="text-center py-8 text-gray-400 loading" id="content-${pasaran.name.replace(/\s+/g,'')}">
-          Loading result...
-        </div>
-        <a href="${pasaran.url}" target="_blank" class="text-blue-400 text-xs hover:underline block text-center mt-4">
-          Buka Situs Asli →
-        </a>
-      `;
-      return card;
-    }
+    // Render semua card di dashboard
+    function renderDashboard(filtered = null) {
+      const container = document.getElementById('dashboard');
+      container.innerHTML = '';
 
-    async function refreshSingle(btn, url) {
-      const container = btn.parentElement.parentElement.querySelector("div[id^='content-']");
-      container.innerHTML = `<span class="loading">Mengambil result terbaru...</span>`;
-      
-      const html = await fetchWithProxy(url);
-      if (!html) {
-        container.innerHTML = `<span class="text-red-400">Gagal mengambil data.<br>Coba lagi atau update manual.</span>`;
-        return;
-      }
-      
-      container.innerHTML = `
-        <div class="text-sm text-gray-300 break-all p-4 bg-gray-950 rounded-2xl">
-          Result berhasil diambil (ukuran ${html.length} karakter).<br>
-          <span class="text-yellow-400">Silakan cek situs asli untuk result lengkap.</span>
-        </div>
-      `;
-    }
+      const list = filtered || pasaranList;
 
-    async function refreshAll() {
-      const buttons = document.querySelectorAll("button[onclick^='refreshSingle']");
-      buttons.forEach(btn => {
-        const url = btn.getAttribute("onclick").match(/'([^']+)'/)[1];
-        refreshSingle(btn, url);
+      list.forEach(name => {
+        const data = results[name] || { date: '-', angkaSah: '—', prize2: '—', prize3: '—' };
+        
+        const cardHTML = `
+          <div class="bg-[#2c1a14] border border-amber-500/30 rounded-3xl p-6 gold-border hover:border-amber-400 transition-all">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-2xl font-bold">${name}</h3>
+              <span onclick="editResult('${name}')" class="text-xs bg-amber-500 text-black px-4 py-1 rounded-2xl cursor-pointer">EDIT</span>
+            </div>
+            <div class="text-amber-300 text-sm mb-3">${data.date}</div>
+            
+            <div class="text-center mb-4">
+              <div class="text-amber-400 text-xs font-bold tracking-widest">ANGKA SAH</div>
+              <div class="prize-number text-amber-300">${data.angkaSah}</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div class="text-center">
+                <div class="text-amber-400/70">2ND</div>
+                <div class="font-mono text-xl">${data.prize2}</div>
+              </div>
+              <div class="text-center">
+                <div class="text-amber-400/70">3RD</div>
+                <div class="font-mono text-xl">${data.prize3}</div>
+              </div>
+            </div>
+          </div>`;
+        
+        container.innerHTML += cardHTML;
       });
+
+      if (list.length === 0) {
+        container.innerHTML = `<p class="col-span-full text-center text-amber-300 py-12 text-xl">Tidak ada pasaran ditemukan 😢</p>`;
+      }
     }
 
-    // Inisialisasi semua pasaran
+    // Filter pencarian
+    function filterPasaran() {
+      const keyword = document.getElementById('search-input').value.toUpperCase().trim();
+      const filtered = pasaranList.filter(p => p.toUpperCase().includes(keyword));
+      renderDashboard(filtered);
+    }
+
+    // Simpan hasil baru / update
+    function saveResult() {
+      const pasaran = document.getElementById('modal-pasaran').value;
+      const tanggal = document.getElementById('modal-tanggal').value;
+      const angkaSah = document.getElementById('modal-angka-sah').value;
+      const prize2 = document.getElementById('modal-prize2').value || '—';
+      const prize3 = document.getElementById('modal-prize3').value || '—';
+
+      results[pasaran] = {
+        date: tanggal,
+        angkaSah: angkaSah || '—',
+        prize2: prize2,
+        prize3: prize3
+      };
+
+      saveToLocal();
+      hideInputModal();
+      renderDashboard();
+      
+      // Notifikasi
+      const notif = document.createElement('div');
+      notif.className = 'fixed bottom-6 right-6 bg-green-600 text-white px-8 py-4 rounded-3xl shadow-xl';
+      notif.textContent = `✅ ${pasaran} berhasil disimpan!`;
+      document.body.appendChild(notif);
+      setTimeout(() => notif.remove(), 2500);
+    }
+
+    // Buka modal input
+    function showInputModal() {
+      const select = document.getElementById('modal-pasaran');
+      select.innerHTML = '<option value="">— Pilih Pasaran —</option>';
+      pasaranList.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        select.appendChild(opt);
+      });
+      document.getElementById('input-modal').classList.remove('hidden');
+    }
+
+    function hideInputModal() {
+      document.getElementById('input-modal').classList.add('hidden');
+    }
+
+    // Edit hasil yang sudah ada
+    function editResult(name) {
+      const data = results[name];
+      if (!data) return;
+
+      document.getElementById('modal-pasaran').value = name;
+      document.getElementById('modal-tanggal').value = data.date;
+      document.getElementById('modal-angka-sah').value = data.angkaSah === '—' ? '' : data.angkaSah;
+      document.getElementById('modal-prize2').value = data.prize2 === '—' ? '' : data.prize2;
+      document.getElementById('modal-prize3').value = data.prize3 === '—' ? '' : data.prize3;
+
+      showInputModal();
+    }
+
+    // Preview Caption Twitter (sesuai gambar)
+    function previewTwitter() {
+      const pasaran = document.getElementById('modal-pasaran').value || 'GUANGDONG';
+      const tanggal = document.getElementById('modal-tanggal').value;
+      const angka = document.getElementById('modal-angka-sah').value || 'XXXXXX';
+
+      const caption = `${pasaran} - ${tanggal}\n🎉 ANGKA SAH : ${angka}\n✅ Langsung dari pusat\n\n#Togel #AngkaSah #${pasaran.replace(/\s+/g,'')}`;
+
+      alert('📋 CAPTION TWITTER SIAP COPY:\n\n' + caption + '\n\n(Kamu bisa langsung paste ke Twitter/X)');
+      hideInputModal();
+    }
+
+    // Refresh semua (auto + manual)
+    function refreshAll() {
+      renderDashboard();
+    }
+
+    // Export JSON supaya bisa di-upload ke GitHub (permanen)
+    function exportJSON() {
+      const dataStr = JSON.stringify(results, null, 2);
+      const blob = new Blob([dataStr], {type: 'application/json'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'results-angkasah.json';
+      link.click();
+      alert('✅ File results-angkasah.json sudah di-download!\n\nUpload file ini ke repo GitHub kamu supaya data tetap ada untuk semua orang.');
+    }
+
+    // AUTO REFRESH setiap 30 detik
+    function startAutoRefresh() {
+      setInterval(() => {
+        renderDashboard();
+      }, 30000);
+    }
+
+    // Inisialisasi pertama kali
     window.onload = () => {
-      const container = document.getElementById("pasaran-container");
-      pasaranList.forEach(pasaran => {
-        container.appendChild(createCard(pasaran));
-      });
-      
-      // Auto refresh pertama kali
-      setTimeout(() => {
-        refreshAll();
-      }, 800);
+      renderDashboard();
+      startAutoRefresh();
     };
   </script>
 </body>
